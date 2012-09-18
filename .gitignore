@@ -1,0 +1,14 @@
+.coverage
+*.pyc
+*.bak
+*.db
+*.sw?
+*.orig
+*.mak.py
+build/*
+docs/.build/*
+dist/*
+.svn
+*.egg-info/*
+.noseids
+.idea
