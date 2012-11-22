@@ -24,6 +24,11 @@ def text_(s, encoding='utf-8', errors='strict'):
         return s.decode(encoding, errors)
     return s # pragma: no cover
 
+def bytes_(s, encoding='utf-8', errors='strict'):
+    if isinstance(s, text_type):
+        return s.encode(encoding, errors)
+    return s
+
 if PY3: # pragma: no cover
     def native_(s, encoding='latin-1', errors='strict'):
         if isinstance(s, text_type):
