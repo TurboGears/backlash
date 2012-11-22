@@ -32,3 +32,6 @@ def gen_salt(length):
         raise ValueError('requested salt of length <= 0')
     return ''.join(_sys_rng.choice(SALT_CHARS) for _ in range(length))
 
+class RequestContext(dict):
+    def __getattr__(self, attr):
+        return self[attr]

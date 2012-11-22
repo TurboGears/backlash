@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 
 from backlash._compat import string_types, bytes_
 from backlash.tbtools import get_current_traceback
+from backlash.utils import RequestContext
 
 class TraceErrorsMiddleware(object):
     def __init__(self, application, reporters):
@@ -22,7 +23,10 @@ class TraceErrorsMiddleware(object):
             if hasattr(app_iter, 'close'):
                 app_iter.close()
 
-            traceback = get_current_traceback(skip=1, show_hidden_frames=False)
+            context = RequestContext({'environ':dict(environ)})
+            for injector in self.context_injectors:
+                context.update(injector(environ))
+            traceback = get_current_traceback(skip=1, show_hidden_frames=False, context=context)
 
             try:
                 start_response('500 INTERNAL SERVER ERROR', [

@@ -143,11 +143,12 @@ def _wrap_compiler(console):
 
 class _InteractiveConsole(code.InteractiveInterpreter):
 
-    def __init__(self, globals, locals):
+    def __init__(self, globals, locals, context):
         code.InteractiveInterpreter.__init__(self, locals)
         self.globals = dict(globals)
         self.globals['dump'] = dump
         self.globals['help'] = helper
+        self.globals['ctx'] = context
         self.globals['__loader__'] = self.loader = _ConsoleLoader()
         self.more = False
         self.buffer = []
@@ -193,12 +194,12 @@ class _InteractiveConsole(code.InteractiveInterpreter):
 class Console(object):
     """An interactive console."""
 
-    def __init__(self, globals=None, locals=None):
+    def __init__(self, globals=None, locals=None, context=None):
         if locals is None:
             locals = {}
         if globals is None:
             globals = {}
-        self._ipy = _InteractiveConsole(globals, locals)
+        self._ipy = _InteractiveConsole(globals, locals, context)
 
     def eval(self, code):
         return self._ipy.runsource(code)

@@ -15,7 +15,7 @@ from webob import Request, Response
 
 from backlash.tbtools import get_current_traceback, render_console_html
 from backlash.console import Console
-from backlash.utils import gen_salt
+from backlash.utils import gen_salt, RequestContext
 
 class _ConsoleFrame(object):
     """Helper class so that we can reuse the frame console code for the
@@ -53,9 +53,9 @@ class DebuggedApplication(object):
     :param lodgeit_url: the base URL of the LodgeIt instance to use for
                         pasting tracebacks.
     """
-    def __init__(self, app, evalex=True, console_path='/console',
+    def __init__(self, app, evalex=True, console_path='/__console__',
                  console_init_func=None, show_hidden_frames=False,
-                 lodgeit_url='http://paste.pocoo.org/'):
+                 lodgeit_url='http://paste.pocoo.org/', context_injectors=None):
         if not console_init_func:
             console_init_func = dict
         self.app = app
@@ -67,6 +67,7 @@ class DebuggedApplication(object):
         self.show_hidden_frames = show_hidden_frames
         self.lodgeit_url = lodgeit_url
         self.secret = gen_salt(20)
+        self.context_injectors = context_injectors or []
 
     def debug_application(self, environ, start_response):
         """Run the application and conserve the traceback frames."""
@@ -80,7 +81,12 @@ class DebuggedApplication(object):
         except Exception:
             if hasattr(app_iter, 'close'):
                 app_iter.close()
-            traceback = get_current_traceback(skip=1, show_hidden_frames=self.show_hidden_frames)
+
+            context = RequestContext({'environ':dict(environ)})
+            for injector in self.context_injectors:
+                context.update(injector(environ))
+
+            traceback = get_current_traceback(skip=1, show_hidden_frames=self.show_hidden_frames, context=context)
             for frame in traceback.frames:
                 self.frames[frame.id] = frame
             self.tracebacks[traceback.id] = traceback

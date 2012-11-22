@@ -140,7 +140,7 @@ def render_console_html(secret):
     }
 
 
-def get_current_traceback(show_hidden_frames=False, skip=0):
+def get_current_traceback(show_hidden_frames=False, skip=0, context=None):
     """Get the current exception info as `Traceback` object.  Per default
     calling this method will reraise system exceptions such as generator exit,
     system exit or others.  This behavior can be disabled by passing `False`
@@ -151,7 +151,7 @@ def get_current_traceback(show_hidden_frames=False, skip=0):
         if tb.tb_next is None:
             break
         tb = tb.tb_next
-    tb = Traceback(exc_type, exc_value, tb)
+    tb = Traceback(exc_type, exc_value, tb, context=context)
     if not show_hidden_frames:
         tb.filter_hidden_frames()
     return tb
@@ -187,9 +187,11 @@ class Line(object):
 class Traceback(object):
     """Wraps a traceback."""
 
-    def __init__(self, exc_type, exc_value, tb):
+    def __init__(self, exc_type, exc_value, tb, context=None):
         self.exc_type = exc_type
         self.exc_value = exc_value
+        self.context = context
+
         if not isinstance(exc_type, str):
             exception_type = exc_type.__name__
             if exc_type.__module__ not in ('__builtin__', 'exceptions'):
@@ -202,7 +204,7 @@ class Traceback(object):
         # the the magic variables as defined by paste.exceptions.collector
         self.frames = []
         while tb:
-            self.frames.append(Frame(exc_type, exc_value, tb))
+            self.frames.append(Frame(exc_type, exc_value, tb, context))
             tb = tb.tb_next
 
     def filter_hidden_frames(self):
@@ -341,11 +343,12 @@ class Traceback(object):
 class Frame(object):
     """A single frame in a traceback."""
 
-    def __init__(self, exc_type, exc_value, tb):
+    def __init__(self, exc_type, exc_value, tb, context=None):
         self.lineno = tb.tb_lineno
         self.function_name = tb.tb_frame.f_code.co_name
         self.locals = tb.tb_frame.f_locals
         self.globals = tb.tb_frame.f_globals
+        self.context = context
 
         fn = inspect.getsourcefile(tb) or inspect.getfile(tb)
         if fn[-4:] in ('.pyo', '.pyc'):
@@ -481,6 +484,6 @@ class Frame(object):
 
     @property
     def console(self):
-        return Console(self.globals, self.locals)
+        return Console(self.globals, self.locals, self.context)
 
     id = property(lambda x: id(x))
