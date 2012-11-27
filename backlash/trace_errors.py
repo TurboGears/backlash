@@ -7,9 +7,10 @@ from backlash.tbtools import get_current_traceback
 from backlash.utils import RequestContext
 
 class TraceErrorsMiddleware(object):
-    def __init__(self, application, reporters):
+    def __init__(self, application, reporters, context_injectors):
         self.app = application
         self.reporters = reporters
+        self.context_injectors = context_injectors
 
     def __call__(self, environ, start_response):
         app_iter = None
