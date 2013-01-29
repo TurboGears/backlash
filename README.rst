@@ -46,6 +46,18 @@ as the ``ctx`` object.
 This feature is used for example by TurboGears to provide back some of the objects
 which were available during execution like the current request.
 
+Example
++++++++++++++++++++++++++++++++
+
+The DebuggedApplication middleware is used by TurboGears in the following way::
+
+    def _turbogears_backlash_context(environ):
+        tgl = environ.get('tg.locals')
+        return {'request':getattr(tgl, 'request', None)}
+
+    app = backlash.DebuggedApplication(app, context_injectors=[_turbogears_backlash_context])
+
+
 Exception Tracing
 ---------------------------------------
 
@@ -61,3 +73,17 @@ While this function is easily replicable using the python logging SMTPHandler, t
 TraceErrorsMiddleware is explicitly meant for web applications crash reporting
 which has the benefit of being able to provide more complete informations and keep a clear
 and separate process in managing errors.
+
+Example
+++++++++++++++++++++++++++++++++
+
+The TraceErrorsMiddleware is used by TurboGears in the following way::
+
+    from backlash.trace_errors import EmailReporter
+
+    def _turbogears_backlash_context(environ):
+       tgl = environ.get('tg.locals')
+       return {'request':getattr(tgl, 'request', None)}
+
+    app = backlash.TraceErrorsMiddleware(app, [EmailReporter(**errorware)],
+                                         context_injectors=[_turbogears_backlash_context])
