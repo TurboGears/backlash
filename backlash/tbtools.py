@@ -32,7 +32,7 @@ HEADER = text_('''\
   "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
-    <title>%(title)s // Werkzeug Debugger</title>
+    <title>%(title)s // Backlash</title>
     <link rel="stylesheet" href="?__debugger__=yes&amp;cmd=resource&amp;f=style.css" type="text/css">
     <!-- We need to make sure this has a favicon so that the debugger does not by
          accident trigger a request to /favicon.ico which might change the application
@@ -53,8 +53,8 @@ HEADER = text_('''\
 
 FOOTER = text_('''\
       <div class="footer">
-        Brought to you by <strong class="arthur">DON'T PANIC</strong>, your
-        friendly Werkzeug powered traceback interpreter.
+        <strong class="arthur">Backlash</strong>, using
+        the Werkzeug Debugger.
       </div>
     </div>
   </body>
