@@ -7,11 +7,11 @@ try:
 except IOError:
     README = ''
 
-version = "0.0.1"
+version = "0.0.1a"
 
 setup(name='backlash',
       version=version,
-      description="standalone version of the Werkzeug Debugger based on WebOb",
+      description="Standalone WebOb port of the Werkzeug Debugger with Python3 support meant to replace WebError in future TurboGears2",
       long_description=README,
       classifiers=['Intended Audience :: Developers',
                    'License :: OSI Approved :: MIT License',
