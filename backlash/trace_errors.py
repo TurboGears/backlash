@@ -78,7 +78,7 @@ class EmailReporter(object):
         self.error_subject_prefix = error_subject_prefix
 
     def report(self, traceback):
-        if not self.smtp_server or not self.from_address:
+        if not self.smtp_server or not self.from_address or not self.error_email:
             return
 
         msg = self.assemble_email(traceback)
@@ -100,8 +100,27 @@ class EmailReporter(object):
             # SSLError is raised in tls connections on closing sometimes
             pass
 
+    def _format_cgi(self, environ):
+        return '\n'.join(('\t%s: %s' % (k, v) for k, v in environ.items() if k.upper() == k))
+
+    def _format_wsgi(self, environ):
+        return '\n'.join(('\t%s: %s' % (k, v) for k, v in environ.items() if k.upper() != k))
+
+    def email_body(self, traceback):
+        body = 'TRACEBACK:\n%s' % traceback.plaintext
+        body += '\n\n\nENVIRON:\n%s' % self._format_cgi(traceback.context['environ'])
+        body += '\n\n\nWSGI:\n%s' % self._format_wsgi(traceback.context['environ'])
+
+        for entry, value in traceback.context.items():
+            if entry == 'environ':
+                continue
+
+            body += '\n\n\n%s:\n\t%r' % (entry.upper(), value)
+
+        return body
+
     def assemble_email(self, traceback):
-        msg = MIMEText(bytes_(traceback.plaintext))
+        msg = MIMEText(bytes_(self.email_body(traceback)))
         msg.set_type('text/plain')
         msg.set_param('charset', 'UTF-8')
 
