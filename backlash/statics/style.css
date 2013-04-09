@@ -1,15 +1,15 @@
 @font-face {
-  font-family: 'Ubuntu';
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: normal;
-  src: local('Ubuntu'), local('Ubuntu-Regular'),
-    url('?__debugger__=yes&cmd=resource&f=ubuntu.ttf') format('truetype');
+  src: local('Open Sans'), local('OpenSans-Regular'),
+    url('?__debugger__=yes&cmd=resource&f=opensans.ttf') format('truetype');
 }
 
 body, input  { font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
                'Verdana', sans-serif; color: #000; text-align: center;
                margin: 1em; padding: 0; font-size: 15px; }
-h1, h2, h3   { font-family: 'Ubuntu', 'Lucida Grande', 'Lucida Sans Unicode',
+h1, h2, h3   { font-family: 'Open Sans', 'Lucida Grande', 'Lucida Sans Unicode',
                'Geneva', 'Verdana', sans-serif; font-weight: normal; }
 
 input        { background-color: #fff; margin: 0; text-align: left;
