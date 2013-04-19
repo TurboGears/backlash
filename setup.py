@@ -7,7 +7,7 @@ try:
 except IOError:
     README = ''
 
-version = "0.0.1a2"
+version = "0.0.2"
 
 setup(name='backlash',
       version=version,
@@ -19,6 +19,7 @@ setup(name='backlash',
                    'Programming Language :: Python :: 2.6',
                    'Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3',
+                   'Programming Language :: Python :: 3.2',
                    'Programming Language :: Python :: 3.2',
                    'Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware',
                    'Topic :: Internet :: WWW/HTTP :: WSGI'],
