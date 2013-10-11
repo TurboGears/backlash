@@ -72,6 +72,6 @@ else: # pragma: no cover
 """)
 
 try:
-    from xmlrpclib import ServerProxy as XmlRpcServerProxy
+    from urllib2 import urlopen
 except ImportError:
-    from xmlrpc.client import ServerProxy as XmlRpcServerProxy
+    from urllib.request import urlopen
