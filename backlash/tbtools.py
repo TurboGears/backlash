@@ -346,7 +346,7 @@ class Traceback(object):
                 frame.function_name
                 ))
             yield text_('    ' + frame.current_line.strip())
-        yield self.exception
+        yield text_(self.exception)
 
     def plaintext(self):
         return text_('\n'.join(self.generate_plaintext_traceback()))
