@@ -10,6 +10,7 @@ class EmailReporter(object):
     def __init__(self, smtp_server=None, from_address=None, error_email=None,
                  smtp_username=None, smtp_password=None, smtp_use_tls=False,
                  error_subject_prefix='', dump_request=False, dump_request_size=50000,
+                 dump_local_frames=False, dump_local_frames_count=2,
                  **unused):
         self.smtp_server = smtp_server
         self.from_address = from_address
@@ -26,6 +27,8 @@ class EmailReporter(object):
         self.error_subject_prefix = error_subject_prefix
         self.dump_request = dump_request
         self.dump_request_size = dump_request_size
+        self.dump_local_frames = dump_local_frames
+        self.dump_local_frames_count = dump_local_frames_count
 
     def report(self, traceback):
         if not self.smtp_server or not self.from_address or not self.error_email:
@@ -58,6 +61,19 @@ class EmailReporter(object):
 
     def email_body(self, traceback):
         body = 'TRACEBACK:\n%s' % traceback.plaintext
+
+        if self.dump_local_frames:
+            body += '\n\n\nLAST FRAMES:'
+            frames_base_index = len(traceback.frames) - self.dump_local_frames_count
+            for idx, frame in enumerate(traceback.frames[-self.dump_local_frames_count:]):
+                body += '\n\tFRAME #%d\n' % (frames_base_index+idx)
+                for key, value in frame.locals.items():
+                    body += "\t\t%20s = " % key
+                    try:
+                        body += '%r\n' % (value,)
+                    except Exception as e:
+                        body += "<UNABLE TO PRINT VALUE>\n"
+
         body += '\n\n\nENVIRON:\n%s' % self._format_cgi(traceback.context['environ'])
         body += '\n\n\nWSGI:\n%s' % self._format_wsgi(traceback.context['environ'])
 
