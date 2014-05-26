@@ -1,19 +1,18 @@
 About backlash
 -------------------------
 
-backlash is a standalone version of the Werkzeug Debugger based on WebOb
-adapted to support for Python3.
+backlash is a swiss army knife for web applications debugging, which provides:
 
-backlash has born as a future replacement for WebError in upcoming TurboGears2 versions.
+    - An Interactive In Browser Debugger based on a Werkzeug Debugger fork ported to WebOb
+    - Crash reporting by email and on Sentry
+    - Slow requests reporting by email and on Sentry.
+
+Backlash was born as a replacement for WebError in TurboGears2.3 versions.
 
 Installing
 -------------------------------
 
 backlash can be installed from pypi::
-
-    easy_install backlash
-
-or::
 
     pip install backlash
 
@@ -65,13 +64,15 @@ The ``TraceErrorsMiddleware`` provides a WSGI middleware that intercepts any exc
 raised during execution, retrieves a traceback object and provides it to one or more
 ``reporters`` to log the error.
 
-By default the ``EmailReporter`` class is provided to send error reports by email.
-This object supports most of the options WebError ErrorMiddleware to provide some
+By default the ``EmailReporter`` and ``SentryReporter`` are provided to send error
+reports by email and on Sentry.
+
+The ``EmailReporter`` supports most of the options WebError ErrorMiddleware to provide some
 kind of backward compatibility and make possible a quick transition.
 
 While this function is easily replicable using the python logging SMTPHandler, the
 TraceErrorsMiddleware is explicitly meant for web applications crash reporting
-which has the benefit of being able to provide more complete informations and keep a clear
+which has the benefit of being able to provide more complete information and keep a clear
 and separate process in managing errors.
 
 Example
@@ -87,3 +88,29 @@ The TraceErrorsMiddleware is used by TurboGears in the following way::
 
     app = backlash.TraceErrorsMiddleware(app, [EmailReporter(**errorware)],
                                          context_injectors=[_turbogears_backlash_context])
+
+Slow Requests Tracing
+---------------------------------------
+
+The ``TraceSlowRequestsMiddleware`` provides a WSGI middleware that tracks requests
+execution time and reports requests that took more than a specified interval to complete
+(by default 25 seconds).
+
+It is also possible to exclude a list of paths that start with a specified string
+to avoid reporting long polling connections or other kind of requests that are
+expected to have a long life spawn.
+
+Example
+++++++++++++++++++++++++++++++++
+
+The TraceSlowRequestsMiddleware is used by TurboGears in the following way::
+
+    from backlash.trace_errors import EmailReporter
+
+    def _turbogears_backlash_context(environ):
+       tgl = environ.get('tg.locals')
+       return {'request':getattr(tgl, 'request', None)}
+
+    app = backlash.TraceSlowRequestsMiddleware(app, [EmailReporter(**errorware)],
+                                               interval=25, exclude_paths=None,
+                                               context_injectors=[_turbogears_backlash_context])

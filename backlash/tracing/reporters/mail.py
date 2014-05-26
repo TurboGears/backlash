@@ -88,7 +88,7 @@ class EmailReporter(object):
     def assemble_email(self, traceback):
         msg = MIMEMultipart()
 
-        subject = bytes_('%s: %s' % (traceback.exc_type, traceback.exc_value))
+        subject = bytes_(traceback.exception)
 
         msg['Subject'] = bytes_(self.error_subject_prefix + subject)
         msg['From'] = bytes_(self.from_address)

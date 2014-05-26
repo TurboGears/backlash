@@ -1,2 +1,3 @@
 from backlash.debug import DebuggedApplication
-from backlash.trace_errors import TraceErrorsMiddleware
+from backlash.tracing.errors import TraceErrorsMiddleware
+from backlash.tracing.slowrequests import TraceSlowRequestsMiddleware

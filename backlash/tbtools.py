@@ -359,10 +359,16 @@ class Frame(object):
     """A single frame in a traceback."""
 
     def __init__(self, exc_type, exc_value, tb, context=None):
-        self.lineno = tb.tb_lineno
-        self.function_name = tb.tb_frame.f_code.co_name
-        self.locals = tb.tb_frame.f_locals
-        self.globals = tb.tb_frame.f_globals
+        if inspect.isframe(tb):
+            self.lineno = tb.f_lineno
+            tb_frame = tb
+        else:
+            self.lineno = tb.tb_lineno
+            tb_frame = tb.tb_frame
+
+        self.function_name = tb_frame.f_code.co_name
+        self.locals = tb_frame.f_locals
+        self.globals = tb_frame.f_globals
         self.context = context
 
         fn = inspect.getsourcefile(tb) or inspect.getfile(tb)
@@ -374,7 +380,7 @@ class Frame(object):
         self.filename = fn
         self.module = self.globals.get('__name__')
         self.loader = self.globals.get('__loader__')
-        self.code = tb.tb_frame.f_code
+        self.code = tb_frame.f_code
 
         # support for paste's traceback extensions
         self.hide = self.locals.get('__traceback_hide__', False)
