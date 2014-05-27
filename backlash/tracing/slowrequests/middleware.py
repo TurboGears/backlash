@@ -93,7 +93,7 @@ class TraceSlowRequestsMiddleware(object):
             job = self.timer.run_later(self.peek,
                                        self.interval,
                                        environ,
-                                       self._get_thread_ident(),
+                                       self._get_thread_id(),
                                        dt.datetime.utcnow())
             environ['BACKLASH_SLOW_TRACING_JOB'] = job
 
