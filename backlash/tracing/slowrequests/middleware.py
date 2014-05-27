@@ -6,8 +6,8 @@ import pprint
 import socket
 import sys
 import tempfile
-import thread
 import linecache
+import threading
 
 from backlash.tbtools import get_current_traceback
 from backlash.frtools import get_thread_stack
@@ -69,6 +69,10 @@ class TraceSlowRequestsMiddleware(object):
                 environ['wsgi.errors'].write('\nError while reporting slow request with %s\n' % r)
                 environ['wsgi.errors'].write(error.plaintext)
 
+    @classmethod
+    def _get_thread_id(cls):
+        return threading.current_thread().ident
+
     def _is_exempt(self, environ):
         """
         Returns True if this request's URL starts with one of the
@@ -89,7 +93,7 @@ class TraceSlowRequestsMiddleware(object):
             job = self.timer.run_later(self.peek,
                                        self.interval,
                                        environ,
-                                       thread.get_ident(),
+                                       self._get_thread_ident(),
                                        dt.datetime.utcnow())
             environ['BACKLASH_SLOW_TRACING_JOB'] = job
 
