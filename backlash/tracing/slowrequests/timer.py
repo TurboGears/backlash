@@ -30,9 +30,8 @@ class Timer(threading.Thread):
     Jobs are scheduled with a delay value in seconds.
     '''
 
-    def __init__(self, group=None, target=None, name=None, args=(),
-                 kwargs=None, verbose=None):
-        super(Timer, self).__init__(group, target, name, args, kwargs, verbose)
+    def __init__(self, *args, **kwargs):
+        super(Timer, self).__init__(*args, **kwargs)
 
         self.lock = threading.Condition()
         self._jobs = []
