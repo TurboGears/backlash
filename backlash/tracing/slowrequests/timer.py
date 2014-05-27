@@ -61,8 +61,8 @@ class Timer(threading.Thread):
     def cancel(self, timer_task):
         self.lock.acquire()
         try:
-            self._jobs = filter(lambda job: job[0] is not timer_task,
-                                self._jobs)
+            self._jobs = list(filter(lambda job: job[0] is not timer_task,
+                                     self._jobs))
             self.lock.notify()
         finally:
             self.lock.release()
