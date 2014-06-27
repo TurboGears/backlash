@@ -3,7 +3,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 import ssl
-from backlash._compat import string_types, bytes_
+from backlash._compat import string_types, bytes_, text_
 
 
 class EmailReporter(object):
@@ -88,13 +88,13 @@ class EmailReporter(object):
     def assemble_email(self, traceback):
         msg = MIMEMultipart()
 
-        subject = bytes_(traceback.exception)
+        subject = text_(traceback.exception)
 
-        msg['Subject'] = bytes_(self.error_subject_prefix + subject)
-        msg['From'] = bytes_(self.from_address)
-        msg['To'] = bytes_(', '.join(self.error_email))
+        msg['Subject'] = text_(self.error_subject_prefix + subject)
+        msg['From'] = text_(self.from_address)
+        msg['To'] = text_(', '.join(self.error_email))
 
-        text = MIMEText(bytes_(self.email_body(traceback)))
+        text = MIMEText(bytes_(self.email_body(traceback)), 'plain', 'utf-8')
         text.set_type('text/plain')
         text.set_param('charset', 'UTF-8')
         msg.attach(text)

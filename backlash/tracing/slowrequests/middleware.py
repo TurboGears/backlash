@@ -1,16 +1,9 @@
 import datetime as dt
-import inspect
-import logging
 import os
-import pprint
-import socket
-import sys
-import tempfile
-import linecache
 import threading
 
 from backlash.tbtools import get_current_traceback
-from backlash.frtools import get_thread_stack
+from backlash.frtools import get_thread_stack, DumpThread
 from backlash.utils import RequestContext
 from .timer import Timer
 
@@ -40,12 +33,10 @@ class TraceSlowRequestsMiddleware(object):
             self._cancel_tracing(environ)
 
     def __call__(self, environ, start_response):
-        app_iter = None
-
         try:
             self._start_tracing(environ)
             return self._stream_response(environ, self.app(environ, start_response))
-        except Exception as e:
+        except Exception:
             self._cancel_tracing(environ)
             raise
 
@@ -60,7 +51,8 @@ class TraceSlowRequestsMiddleware(object):
                              'Started': str(started)}
         })
 
-        traceback = get_thread_stack(thread_id, environ.get('PATH_INFO', ''), context=context)
+        traceback = get_thread_stack(thread_id, environ.get('PATH_INFO', ''),
+                                     context=context, error_type='SlowRequestError')
         for r in self.reporters:
             try:
                 r.report(traceback)
