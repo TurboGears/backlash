@@ -392,6 +392,21 @@ class Frame(object):
                 info = str(info).decode('utf-8', 'replace')
         self.info = info
 
+    def __getattr__(self, item):
+        # Make it look like a plain python frame/traceback object.
+        if item in ('tb_lineno', 'f_lineno'):
+            return self.lineno
+        elif item in ('f_locals', ):
+            return self.locals
+        elif item in ('tb_frame', ):
+            return self
+        elif item in ('f_globals', ):
+            return self.globals
+        elif item in ('f_code', ):
+            return self.code
+
+        raise AttributeError("'Frame' object has no attribute '%s'" % item)
+
     def render(self):
         """Render a single frame in a traceback."""
         return FRAME_HTML % {

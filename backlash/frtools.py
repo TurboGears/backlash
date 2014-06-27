@@ -3,7 +3,7 @@ from .tbtools import Traceback, Frame
 
 
 class DumpThread(Exception):
-    pass
+    backlash_event = True
 
 
 def get_thread_stack(thread_id, description='', error_type=DumpThread, context=None):
