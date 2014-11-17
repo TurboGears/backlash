@@ -53,11 +53,20 @@ class EmailReporter(object):
             # SSLError is raised in tls connections on closing sometimes
             pass
 
+    def _repr_value(self, value):
+        try:
+            value = repr(value)
+        except UnicodeEncodeError as e:
+            value = repr(e)
+        return value
+
     def _format_cgi(self, environ):
-        return '\n'.join(('\t%s: %s' % (k, v) for k, v in environ.items() if k.upper() == k))
+        return '\n'.join(
+            ('\t%s: %s' % (k, self._repr_value(v)) for k, v in environ.items() if k.upper() == k))
 
     def _format_wsgi(self, environ):
-        return '\n'.join(('\t%s: %s' % (k, v) for k, v in environ.items() if k.upper() != k))
+        return '\n'.join(
+            ('\t%s: %s' % (k, self._repr_value(v)) for k, v in environ.items() if k.upper() != k))
 
     def email_body(self, traceback):
         body = 'TRACEBACK:\n%s' % traceback.plaintext
