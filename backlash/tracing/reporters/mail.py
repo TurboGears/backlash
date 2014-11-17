@@ -3,7 +3,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 import ssl
-from backlash._compat import string_types, bytes_, text_
+from backlash._compat import string_types, bytes_, text_, PY3
 
 
 class EmailReporter(object):
@@ -57,7 +57,14 @@ class EmailReporter(object):
         try:
             value = repr(value)
         except UnicodeEncodeError as e:
+            # Cope with WebOb response objects that might be unable to get their repr
             value = repr(e)
+
+        if not PY3:
+            # On PY2 some repr might actually return bytes
+            # In that case just escape them.
+            value = value.decode('ascii', 'replace')
+
         return value
 
     def _format_cgi(self, environ):
