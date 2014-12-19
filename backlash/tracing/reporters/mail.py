@@ -56,7 +56,7 @@ class EmailReporter(object):
     def _repr_value(self, value):
         try:
             value = repr(value)
-        except UnicodeEncodeError as e:
+        except Exception as e:
             # Cope with WebOb response objects that might be unable to get their repr
             value = repr(e)
 
