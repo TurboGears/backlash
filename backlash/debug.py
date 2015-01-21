@@ -85,7 +85,8 @@ class DebuggedApplication(object):
             for injector in self.context_injectors:
                 context.update(injector(environ))
 
-            traceback = get_current_traceback(skip=1, show_hidden_frames=self.show_hidden_frames, context=context)
+            traceback = get_current_traceback(skip=1, show_hidden_frames=self.show_hidden_frames,
+                                              context=context)
             for frame in traceback.frames:
                 self.frames[frame.id] = frame
             self.tracebacks[traceback.id] = traceback
@@ -107,9 +108,10 @@ class DebuggedApplication(object):
                     'response at a point where response headers were already '
                     'sent.\n')
             else:
-                yield traceback.render_full(evalex=self.evalex,
-                    secret=self.secret)\
-                .encode('utf-8', 'replace')
+                yield traceback.render_full(
+                    evalex=self.evalex,
+                    secret=self.secret
+                ).encode('utf-8', 'replace')
 
             traceback.log(environ['wsgi.errors'])
 

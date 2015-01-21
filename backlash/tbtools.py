@@ -142,13 +142,16 @@ def render_console_html(secret):
     }
 
 
-def get_current_traceback(show_hidden_frames=False, skip=0, context=None):
+def get_current_traceback(show_hidden_frames=False, skip=0, context=None, exc_info=None):
     """Get the current exception info as `Traceback` object.  Per default
     calling this method will reraise system exceptions such as generator exit,
     system exit or others.  This behavior can be disabled by passing `False`
     to the function as first parameter.
     """
-    exc_type, exc_value, tb = sys.exc_info()
+    if exc_info is None:
+        exc_info = sys.exc_info()
+
+    exc_type, exc_value, tb = exc_info
     for x in range(skip):
         if tb.tb_next is None:
             break
