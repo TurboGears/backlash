@@ -21,10 +21,7 @@ class EmailReporter(object):
         self.smtp_use_tls = smtp_use_tls
 
         if isinstance(error_email, string_types):
-            if "," in error_email:
-                error_email = error_email.split(",")
-            else:
-                error_email = [error_email]
+            error_email = error_email.split(",")
         self.error_email = error_email
 
         self.error_subject_prefix = error_subject_prefix
