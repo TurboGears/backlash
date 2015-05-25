@@ -23,12 +23,12 @@ class TimerTask(object):
 
 
 class Timer(threading.Thread):
-    '''An alternative to threading.Timer. Where threading.Timer spawns a
+    """An alternative to threading.Timer. Where threading.Timer spawns a
     dedicated thread for each job, this class uses a single, long-lived thread
     to process multiple jobs.
 
     Jobs are scheduled with a delay value in seconds.
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super(Timer, self).__init__(*args, **kwargs)
@@ -38,10 +38,11 @@ class Timer(threading.Thread):
         self.die = False
 
     def run_later(self, callable_, timeout, *args, **kwargs):
-        '''Schedules the specified callable for delayed execution.
+        """Schedules the specified callable for delayed execution.
 
         Returns a TimerTask instance that can be used to cancel pending
-        execution.'''
+        execution.
+        """
 
         self.lock.acquire()
         try:
@@ -72,7 +73,7 @@ class Timer(threading.Thread):
         try:
             self.die = True
             if cancel_jobs:
-                self.jobs = []
+                self._jobs = []
             self.lock.notify()
         finally:
             self.lock.release()

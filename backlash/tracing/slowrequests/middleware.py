@@ -51,8 +51,15 @@ class TraceSlowRequestsMiddleware(object):
                              'Started': str(started)}
         })
 
-        traceback = get_thread_stack(thread_id, environ.get('PATH_INFO', ''),
-                                     context=context, error_type='SlowRequestError')
+        try:
+            traceback = get_thread_stack(thread_id, environ.get('PATH_INFO', ''),
+                                         context=context, error_type='SlowRequestError')
+        except KeyError:
+            environ['wsgi.errors'].write(
+                '\nUnable to retrieve SlowRequest Stack, thread probably finished execution in mean time\n'
+            )
+            return
+
         for r in self.reporters:
             try:
                 r.report(traceback)
