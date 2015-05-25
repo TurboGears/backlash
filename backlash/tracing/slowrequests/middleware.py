@@ -56,7 +56,9 @@ class TraceSlowRequestsMiddleware(object):
                                          context=context, error_type='SlowRequestError')
         except KeyError:
             environ['wsgi.errors'].write(
-                '\nUnable to retrieve SlowRequest Stack, thread probably finished execution in mean time\n'
+                '\nUnable to retrieve SlowRequest Stack {}, '
+                'thread {} probably finished execution in mean time\n'.format(environ.get('PATH_INFO', ''),
+                                                                              thread_id)
             )
             return
 
