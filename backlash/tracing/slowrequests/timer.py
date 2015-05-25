@@ -52,7 +52,7 @@ class Timer(threading.Thread):
 
             job = TimerTask(callable_, *args, **kwargs)
             self._jobs.append((job, time.time() + timeout))
-            self._jobs.sort(key=lambda job: job[1])  # sort on time
+            self._jobs.sort(key=lambda j: j[1])  # sort on time
             self.lock.notify()
 
             return job
