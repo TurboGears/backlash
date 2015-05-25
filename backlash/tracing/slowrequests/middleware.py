@@ -101,6 +101,11 @@ class TraceSlowRequestsMiddleware(object):
     def _cancel_tracing(self, environ):
         try:
             tracing_job = environ['BACKLASH_SLOW_TRACING_JOB']
+        except KeyError:
+            # Job not traced, probavly in extempt
+            return
+
+        try:
             if tracing_job is not None:
                 self.timer.cancel(tracing_job)
         except Exception:
