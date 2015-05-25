@@ -1,6 +1,8 @@
 import datetime as dt
 import os
 import threading
+import logging
+
 
 from backlash.tbtools import get_current_traceback
 from backlash.frtools import get_thread_stack, DumpThread
@@ -55,11 +57,9 @@ class TraceSlowRequestsMiddleware(object):
             traceback = get_thread_stack(thread_id, environ.get('PATH_INFO', ''),
                                          context=context, error_type='SlowRequestError')
         except KeyError:
-            environ['wsgi.errors'].write(
-                '\nUnable to retrieve SlowRequest Stack {}, '
-                'thread {} probably finished execution in mean time\n'.format(environ.get('PATH_INFO', ''),
-                                                                              thread_id)
-            )
+            logging.warn('\nUnable to retrieve SlowRequest Stack %s, '
+                         'thread %s probably finished execution in mean time\n',
+                         environ.get('PATH_INFO', ''), thread_id)
             return
 
         for r in self.reporters:
