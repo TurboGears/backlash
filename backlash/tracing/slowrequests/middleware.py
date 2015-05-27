@@ -96,13 +96,17 @@ class TraceSlowRequestsMiddleware(object):
                                        environ,
                                        self._get_thread_id(),
                                        dt.datetime.utcnow())
-            environ['BACKLASH_SLOW_TRACING_JOB'] = job
+            # In some cases due to webob.Request.call_application() or
+            # paste StatusCodeRedirect middleware multiple _start_tracing for the same
+            # environ might happen without consuming the app_iter for the firsts
+            # and so without canceling them, we register them and cancel them all together.
+            environ.setdefault('BACKLASH_SLOW_TRACING_JOBS', []).append(job)
 
     def _cancel_tracing(self, environ):
         try:
-            tracing_job = environ.get('BACKLASH_SLOW_TRACING_JOB', None)
-            if tracing_job is not None:
-                self.timer.cancel(tracing_job)
+            tracing_jobs = environ.get('BACKLASH_SLOW_TRACING_JOBS', [])
+            for job in tracing_jobs:
+                self.timer.cancel(job)
         except Exception:
             error = get_current_traceback(skip=1, show_hidden_frames=False)
             environ['wsgi.errors'].write('Failed to cancel slow requests tracing timer\n')
