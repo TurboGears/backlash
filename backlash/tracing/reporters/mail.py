@@ -106,7 +106,7 @@ class EmailReporter(object):
 
         subject = text_(traceback.exception)
 
-        msg['Subject'] = text_(self.error_subject_prefix + subject)
+        msg['Subject'] = text_(self.error_subject_prefix + subject).replace('\n', ' ')
         msg['From'] = text_(self.from_address)
         msg['To'] = text_(', '.join(self.error_email))
 
