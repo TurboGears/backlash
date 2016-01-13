@@ -69,11 +69,11 @@ class EmailReporter(object):
 
     def _format_cgi(self, environ):
         return '\n'.join(
-            ('\t%s: %s' % (k, self._repr_value(v)) for k, v in environ.items() if k.upper() == k))
+            ('\t%s: %s' % (k, self._repr_value(environ[k])) for k in sorted(environ.keys()) if k.upper() == k))
 
     def _format_wsgi(self, environ):
         return '\n'.join(
-            ('\t%s: %s' % (k, self._repr_value(v)) for k, v in environ.items() if k.upper() != k))
+            ('\t%s: %s' % (k, self._repr_value(environ[k])) for k in sorted(environ.keys()) if k.upper() != k))
 
     def email_body(self, traceback):
         body = 'TRACEBACK:\n%s' % traceback.plaintext
