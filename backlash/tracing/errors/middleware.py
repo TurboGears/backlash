@@ -3,7 +3,7 @@ from backlash.tbtools import get_current_traceback
 from backlash.utils import RequestContext
 
 import logging
-log = logging.getLogger()
+log = logging.getLogger('backlash')
 
 
 class TraceErrorsMiddleware(object):
@@ -19,6 +19,11 @@ class TraceErrorsMiddleware(object):
 
         traceback = get_current_traceback(skip=2, show_hidden_frames=False, context=context,
                                           exc_info=recorded_exc_info)
+
+        # This will lead to double logging in case backlash logger is set to DEBUG
+        # but this is actually wanted as some environments, like WebTest, swallow
+        # wsgi.environ making the traceback totally disappear.
+        log.debug(traceback.plaintext)
         traceback.log(environ['wsgi.errors'])
 
         for r in self.reporters:
