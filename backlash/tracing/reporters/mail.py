@@ -11,8 +11,9 @@ class EmailReporter(object):
                  smtp_username=None, smtp_password=None, smtp_use_tls=False,
                  error_subject_prefix='', dump_request=False, dump_request_size=50000,
                  dump_local_frames=False, dump_local_frames_count=2,
-                 **unused):
+                 smtp_port=None, **unused):
         self.smtp_server = smtp_server
+        self.smtp_port = smtp_port
         self.from_address = from_address
 
         self.smtp_username = smtp_username
@@ -36,7 +37,7 @@ class EmailReporter(object):
 
         msg = self.assemble_email(traceback)
 
-        server = smtplib.SMTP(self.smtp_server)
+        server = smtplib.SMTP(self.smtp_server, self.smtp_port)
         if self.smtp_use_tls:
             server.ehlo()
             server.starttls()
