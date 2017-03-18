@@ -18,6 +18,10 @@ from backlash.tbtools import get_current_traceback, render_console_html
 from backlash.console import Console
 from backlash.utils import gen_salt, RequestContext
 
+import logging
+log = logging.getLogger('backlash')
+
+
 class _ConsoleFrame(object):
     """Helper class so that we can reuse the frame console code for the
     standalone console.
@@ -113,6 +117,10 @@ class DebuggedApplication(object):
                     secret=self.secret
                 ).encode('utf-8', 'replace')
 
+            # This will lead to double logging in case backlash logger is set to DEBUG
+            # but this is actually wanted as some environments, like WebTest, swallow
+            # wsgi.environ making the traceback totally disappear.
+            log.debug(traceback.plaintext)
             traceback.log(environ['wsgi.errors'])
 
     def execute_command(self, request, command, frame):
