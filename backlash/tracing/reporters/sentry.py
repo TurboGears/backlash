@@ -33,7 +33,7 @@ class SentryReporter(object):
                                        stack=traceback.frames)
         else:
             # This is a real crash
-            self.client.captureException(data=data)
+            self.client.captureException(exc_info=traceback.exc_info, data=data)
 
 
 class RavenNotAvailable(Exception):
