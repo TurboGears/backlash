@@ -195,6 +195,7 @@ class Traceback(object):
     def __init__(self, exc_type, exc_value, tb, context=None):
         self.exc_type = exc_type
         self.exc_value = exc_value
+        self.exc_info = (exc_type, exc_value, tb,)
         self.context = context
 
         if not isinstance(exc_type, str):
