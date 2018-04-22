@@ -1,4 +1,4 @@
-import sys
+import sys, inspect
 from .tbtools import Traceback, Frame
 
 
@@ -19,7 +19,8 @@ def get_thread_stack(thread_id, description='', error_type=DumpThread, context=N
     f = sys._current_frames()[thread_id]
     n = 0
     while f is not None:
-        tb.frames.insert(0, Frame(error_type, e, f, context))
+        if inspect.isframe(f):
+            tb.frames.insert(0, Frame(error_type, e, f, context))
         f = f.f_back
         n += 1
 
