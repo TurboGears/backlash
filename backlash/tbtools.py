@@ -23,7 +23,7 @@ from backlash.console import Console
 from backlash._compat import text_, native_, string_types, text_type, exec_, urlopen
 
 _coding_re = re.compile(r'coding[:=]\s*([-\w.]+)')
-_line_re = re.compile(r'^(.*?)$(?m)')
+_line_re = re.compile(r'^(.*?)$', re.MULTILINE)
 _funcdef_re = re.compile(r'^(\s*def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)')
 UTF8_COOKIE = '\xef\xbb\xbf'
 
