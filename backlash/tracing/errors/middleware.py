@@ -56,7 +56,7 @@ class TraceErrorsMiddleware(object):
 
     def _report_errors_with_response(self, environ, start_response):
         self._report_errors(environ, None)
-        self._generate_response(environ, start_response)
+        return self._generate_response(environ, start_response)
 
     def _report_errors_while_consuming_iter(self, app_iter, environ, start_response):
         try:
