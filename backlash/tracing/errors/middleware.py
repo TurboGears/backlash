@@ -34,9 +34,7 @@ class TraceErrorsMiddleware(object):
                 environ['wsgi.errors'].write('\nError while reporting exception with %s\n' % r)
                 environ['wsgi.errors'].write(error.plaintext)
 
-    def _report_errors_with_response(self, environ, start_response):
-        self._report_errors(environ, None)
-
+    def _generate_response(self, environ, start_response):
         try:
             start_response('500 INTERNAL SERVER ERROR', [
                 ('Content-Type', 'text/html; charset=utf-8'),
@@ -55,6 +53,10 @@ class TraceErrorsMiddleware(object):
                 'sent.\n')
         else:
             yield bytes_('Internal Server Error')
+
+    def _report_errors_with_response(self, environ, start_response):
+        self._report_errors(environ, None)
+        return self._generate_response(environ, start_response)
 
     def _report_errors_while_consuming_iter(self, app_iter, environ, start_response):
         try:
