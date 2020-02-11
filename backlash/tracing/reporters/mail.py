@@ -31,10 +31,11 @@ class EmailReporter(object):
         self.dump_local_frames = dump_local_frames
         self.dump_local_frames_count = dump_local_frames_count
 
-    def report(self, traceback):
         if not self.smtp_server or not self.from_address or not self.error_email:
-            return
+            raise ValueError("Backlash email reporting requires "
+                             "smtp_server, from_address and error_email settings") 
 
+    def report(self, traceback):
         msg = self.assemble_email(traceback)
 
         server = smtplib.SMTP(self.smtp_server, self.smtp_port)
