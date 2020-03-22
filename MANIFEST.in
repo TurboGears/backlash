@@ -1,2 +1,3 @@
 global-exclude *.pyc
 recursive-include backlash/statics *
+include LICENSE
