@@ -60,14 +60,13 @@ class TraceErrorsMiddleware(object):
 
     def _report_errors_while_consuming_iter(self, app_iter, environ, start_response):
         try:
-            for item in app_iter:
-                yield item
-            if hasattr(app_iter, 'close'):
-                app_iter.close()
+            try:
+                for item in app_iter:
+                    yield item
+            finally:  # also after _report_errors_while_consuming_iter().close() injected GeneratorExit
+                if hasattr(app_iter, 'close'):
+                    app_iter.close()
         except Exception:
-            if hasattr(app_iter, 'close'):
-                app_iter.close()
-
             for chunk in self._report_errors_with_response(environ, start_response):
                 yield chunk
 
