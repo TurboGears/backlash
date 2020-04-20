@@ -76,15 +76,14 @@ class DebuggedApplication(object):
         """Run the application and conserve the traceback frames."""
         app_iter = None
         try:
-            app_iter = self.app(environ, start_response)
-            for item in app_iter:
-                yield item
-            if hasattr(app_iter, 'close'):
-                app_iter.close()
+            try:
+                app_iter = self.app(environ, start_response)
+                for item in app_iter:
+                    yield item
+            finally:
+                if hasattr(app_iter, 'close'):
+                    app_iter.close()
         except Exception:
-            if hasattr(app_iter, 'close'):
-                app_iter.close()
-
             context = RequestContext({'environ':dict(environ)})
             for injector in self.context_injectors:
                 context.update(injector(environ))
