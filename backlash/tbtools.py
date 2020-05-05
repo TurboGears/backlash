@@ -264,7 +264,7 @@ class Traceback(object):
         if logfile is None:
             logfile = sys.stderr
         tb = self.plaintext.rstrip() + '\n'
-        logfile.write(tb.encode("utf-8"))
+        logfile.write(tb)
 
     def paste(self):
         """Create a paste and return the paste id."""
