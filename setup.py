@@ -7,7 +7,7 @@ try:
 except IOError:
     README = ''
 
-version = "0.3.0"
+version = "0.3.1"
 
 setup(name='backlash',
       version=version,
