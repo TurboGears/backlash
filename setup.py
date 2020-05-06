@@ -7,7 +7,7 @@ try:
 except IOError:
     README = ''
 
-version = "0.2.0"
+version = "0.3.0"
 
 setup(name='backlash',
       version=version,
@@ -16,11 +16,8 @@ setup(name='backlash',
       classifiers=['Intended Audience :: Developers',
                    'License :: OSI Approved :: MIT License',
                    'Programming Language :: Python',
-                   'Programming Language :: Python :: 2.6',
                    'Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3',
-                   'Programming Language :: Python :: 3.2',
-                   'Programming Language :: Python :: 3.2',
                    'Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware',
                    'Topic :: Internet :: WWW/HTTP :: WSGI'],
       keywords='wsgi',
