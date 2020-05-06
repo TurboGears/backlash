@@ -20,7 +20,7 @@ from tokenize import TokenError
 from backlash.utils import escape
 from backlash.console import Console
 
-from backlash._compat import text_, native_, string_types, text_type, exec_, urlopen
+from backlash._compat import PY2, text_, native_, string_types, text_type, exec_, urlopen
 
 _coding_re = re.compile(r'coding[:=]\s*([-\w.]+)')
 _line_re = re.compile(r'^(.*?)$', re.MULTILINE)
@@ -264,6 +264,8 @@ class Traceback(object):
         if logfile is None:
             logfile = sys.stderr
         tb = self.plaintext.rstrip() + '\n'
+        if PY2:
+            tb = tb.encode('utf-8')
         logfile.write(tb)
 
     def paste(self):
