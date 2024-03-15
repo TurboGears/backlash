@@ -22,7 +22,7 @@ class TraceSlowRequestsMiddleware(object):
         self.exclude_paths = exclude_paths or []
 
         self.timer = Timer()
-        self.timer.setDaemon(True)
+        self.timer.daemon = True
         self.timer.start()
 
     def _stream_response(self, environ, data):
