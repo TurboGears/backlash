@@ -3,9 +3,9 @@ About backlash
 
 backlash is a swiss army knife for web applications debugging, which provides:
 
-    - An Interactive In Browser Debugger based on a Werkzeug Debugger fork ported to WebOb
-    - Crash reporting by email and on Sentry
-    - Slow requests reporting by email and on Sentry.
+- An Interactive In Browser Debugger based on a Werkzeug Debugger fork ported to WebOb
+- Crash reporting by email and on Sentry
+- Slow requests reporting by email and on Sentry.
 
 Backlash was born as a replacement for WebError in TurboGears2.3 versions.
 
