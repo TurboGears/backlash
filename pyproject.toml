@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "backlash"
+version = "0.4.0"
+description = "Standalone WebOb port of the Werkzeug Debugger with Python3 support meant to replace WebError in TurboGears2"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = { text = "MIT" }
+authors = [
+  { name = "Alessandro Molina", email = "alessandro@molina.fyi" }
+]
+keywords = ["wsgi", "debugger", "webob", "python3", "web"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware",
+  "Topic :: Internet :: WWW/HTTP :: WSGI"
+]
+dependencies = [
+  "WebOb"
+]
+
+[project.urls]
+Homepage = "https://github.com/TurboGears/backlash"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+exclude = ["examples", "tests"]
