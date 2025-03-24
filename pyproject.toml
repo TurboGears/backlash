@@ -7,7 +7,7 @@ name = "backlash"
 version = "0.4.0"
 description = "Standalone WebOb port of the Werkzeug Debugger with Python3 support meant to replace WebError in TurboGears2"
 readme = { file = "README.rst", content-type = "text/x-rst" }
-license = { text = "MIT" }
+license = "MIT"
 authors = [
   { name = "Alessandro Molina", email = "alessandro@molina.fyi" }
 ]
