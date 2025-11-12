@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "backlash"
-version = "0.4.0"
+version = "0.4.1"
 description = "Standalone WebOb port of the Werkzeug Debugger with Python3 support meant to replace WebError in TurboGears2"
 readme = { file = "README.rst", content-type = "text/x-rst" }
-license = "MIT"
+license = { file = "LICENSE" }
 authors = [
   { name = "Alessandro Molina", email = "alessandro@molina.fyi" }
 ]
