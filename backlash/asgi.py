@@ -72,23 +72,9 @@ class AsgiDebuggedApplication(DebuggerCore):
                     # output can cause false-positives.
                     extra_headers=[(b'x-xss-protection', b'0')])
             else:
-                # Response already on the wire: mirror the WSGI streamed
-                # fallback and only log the failure.
-                # TODO(EVO-050): Terminate or re-raise on post-start ASGI crash
-                # Why:
-                # - The probe mirrors the WSGI swallow-and-log fallback, but in
-                #   ASGI that leaves the stream open (last body message had
-                #   more_body=True, no close, no re-raise): real servers like
-                #   uvicorn leave the client hanging.
-                # Done:
-                # - After logging and capturing, the crash either re-raises to
-                #   the server (ASGI ecosystem convention) or a final body
-                #   message closes the stream; the strict-xfail acceptance test
-                #   tests/test_asgi.py::test_started_crash_terminates_stream
-                #   passes and its xfail marker is removed.
-                # Non-Goals:
-                # - No change to the pre-start crash path or debugger page.
-                # - No change to the WSGI streamed fallback.
+                # Response already on the wire: log and capture, then
+                # re-raise below so the server terminates the stream
+                # (ASGI convention).
                 log.error(
                     'Debugging middleware caught exception in ASGI '
                     'application at a point where the response was '
@@ -96,6 +82,8 @@ class AsgiDebuggedApplication(DebuggerCore):
 
             log.debug(traceback.plaintext)
             traceback.log(sys.stderr)
+            if response_started:
+                raise
 
 
 async def _send_page(send, status, content_type, body, extra_headers=()):

@@ -80,30 +80,25 @@ def test_exception_renders_debugger_page():
     assert app.secret.encode('ascii') in body  # evalex wiring in the page
 
 
-def test_started_response_falls_back_to_log_only(caplog):
+def test_started_crash_logs_captures_and_reraises(caplog):
+    # Post-start crash contract: log and capture the traceback, then
+    # re-raise so the ASGI server terminates the dangling stream.
     app = AsgiDebuggedApplication(streaming_failing_app)
+    scope = {'type': 'http', 'method': 'GET', 'path': '/',
+             'query_string': b'', 'headers': [], 'root_path': ''}
+    messages = []
+
+    async def send(message):
+        messages.append(message)
+
     with caplog.at_level('ERROR', logger='backlash'):
-        messages = run_asgi(app)
-    # exception swallowed, no second response.start on the wire
+        with pytest.raises(ZeroDivisionError):
+            asyncio.run(app(scope, None, send))
     starts = [m for m in messages if m['type'] == 'http.response.start']
+    # the app's partial response went out untouched, no second start
     assert len(starts) == 1 and starts[0]['status'] == 200
     assert len(app.tracebacks) == 1  # still captured for inspection
     assert 'already started' in caplog.text  # failure is actually logged
-
-
-@pytest.mark.xfail(strict=True,
-                   reason='EVO-050: post-start crash leaves the stream open')
-def test_started_crash_terminates_stream():
-    # Acceptance for EVO-050: after a crash mid-response the middleware must
-    # not leave the client hanging: either the exception propagates to the
-    # server or a final body message closes the stream.
-    app = AsgiDebuggedApplication(streaming_failing_app)
-    try:
-        messages = run_asgi(app)
-    except ZeroDivisionError:
-        return  # re-raised to the server: acceptable
-    bodies = [m for m in messages if m['type'] == 'http.response.body']
-    assert bodies and bodies[-1].get('more_body', False) is False
 
 
 def test_frame_command_evaluates_in_crash_context():

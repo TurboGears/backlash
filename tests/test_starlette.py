@@ -92,13 +92,28 @@ def test_add_middleware_frame_eval_through_starlette_stack():
     assert b'42' in body
 
 
-def test_outer_wrap_falls_back_to_log_only():
-    # Documented caveat: ServerErrorMiddleware responds 500 before
-    # re-raising, so an outer wrap sees a started response and must only
-    # log, without corrupting the wire with a second response.
+def test_outer_wrap_reraises_after_starlette_500():
+    # Documented caveat: ServerErrorMiddleware sends its plain 500 then
+    # re-raises, so an outer wrap sees a started response: it logs,
+    # captures, and re-raises to the server without corrupting the wire.
     app = AsgiDebuggedApplication(make_app())
-    starts, body = run_http(app, path='/crash')
-    assert len(starts) == 1
-    assert starts[0]['status'] == 500
+    scope = {'type': 'http', 'http_version': '1.1', 'method': 'GET',
+             'scheme': 'http', 'path': '/crash', 'raw_path': b'/crash',
+             'root_path': '', 'query_string': b'', 'headers': [],
+             'client': ('testclient', 123), 'server': ('testserver', 80)}
+    messages = []
+
+    async def receive():
+        return {'type': 'http.request'}
+
+    async def send(message):
+        messages.append(message)
+
+    with pytest.raises(ZeroDivisionError):
+        asyncio.run(app(scope, receive, send))
+    starts = [m for m in messages if m['type'] == 'http.response.start']
+    body = b''.join(m.get('body', b'') for m in messages
+                    if m['type'] == 'http.response.body')
+    assert len(starts) == 1 and starts[0]['status'] == 500
     assert b'SECRET' not in body  # Starlette's plain 500, not the debugger
     assert len(app.tracebacks) == 1  # still captured for inspection
