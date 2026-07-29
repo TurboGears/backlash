@@ -215,8 +215,6 @@ def test_console_page_and_eval():
     assert b'42' in body
 
 
-@pytest.mark.xfail(strict=True,
-                   reason='EVO-010: root_path not honored for mounted apps yet')
 def test_console_reachable_under_mounted_root_path():
     # Acceptance for EVO-010: when the app is mounted (e.g. Starlette Mount
     # or uvicorn --root-path), scope['path'] carries the mount prefix and

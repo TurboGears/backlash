@@ -32,18 +32,12 @@ class AsgiDebuggedApplication(DebuggerCore):
 
         query = {key: values[0] for key, values in
                  parse_qs(scope.get('query_string', b'').decode('latin-1')).items()}
-        # TODO(EVO-010): Honor scope root_path when matching debugger paths
-        # Why:
-        # - The probe matches console_path against scope['path'], which
-        #   includes the mount prefix when the app is mounted (e.g. Starlette
-        #   Mount or uvicorn --root-path), so /__console__ never matches.
-        # Done:
-        # - Debugger path matching strips scope['root_path'] before comparing
-        #   with console_path, with a test covering a mounted app.
-        # Non-Goals:
-        # - No rewriting of the relative resource/eval URLs in the rendered
-        #   pages: they are query-string based and already mount-safe.
-        response = self.debugger_response(scope['path'], query)
+        # scope['path'] includes the mount prefix; console_path is app-relative
+        path = scope['path']
+        root_path = scope.get('root_path', '')
+        if root_path and path.startswith(root_path):
+            path = path[len(root_path):]
+        response = self.debugger_response(path, query)
         if response is not None:
             await _send_page(send, *response)
             return
