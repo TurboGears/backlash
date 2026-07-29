@@ -23,6 +23,12 @@ dependencies = [
   "WebOb"
 ]
 
+[project.optional-dependencies]
+testing = [
+  "pytest",
+  "starlette"
+]
+
 [project.urls]
 Homepage = "https://github.com/TurboGears/backlash"
 
