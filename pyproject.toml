@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "backlash"
 version = "0.4.1"
-description = "Standalone WebOb port of the Werkzeug Debugger with Python3 support meant to replace WebError in TurboGears2"
+description = "Interactive in-browser debugger and error reporting middleware for WSGI and ASGI applications"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 license = { file = "LICENSE" }
 authors = [
   { name = "Alessandro Molina", email = "alessandro@molina.fyi" }
 ]
-keywords = ["wsgi", "debugger", "webob", "python3", "web"]
+keywords = ["wsgi", "asgi", "debugger", "web"]
 classifiers = [
   "Intended Audience :: Developers",
   "Programming Language :: Python",
@@ -19,10 +19,6 @@ classifiers = [
   "Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware",
   "Topic :: Internet :: WWW/HTTP :: WSGI"
 ]
-dependencies = [
-  "WebOb"
-]
-
 [project.optional-dependencies]
 testing = [
   "pytest",
