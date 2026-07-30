@@ -3,9 +3,10 @@ About backlash
 
 backlash is a swiss army knife for web applications debugging, which provides:
 
-- An Interactive In Browser Debugger based on a Werkzeug Debugger fork ported to WebOb
-- Crash reporting by email and on Sentry
-- Slow requests reporting by email and on Sentry.
+- An Interactive In Browser Debugger for WSGI and ASGI applications,
+  based on a Werkzeug Debugger fork
+- Crash reporting by email and on Sentry (WSGI)
+- Slow requests reporting by email and on Sentry (WSGI).
 
 Backlash was born as a replacement for WebError in TurboGears2.3 versions.
 
@@ -16,27 +17,53 @@ backlash can be installed from pypi::
 
     pip install backlash
 
-should just work for most of the users
+should just work for most of the users. backlash has no runtime dependencies.
 
 Debugging and Console
 ----------------------------------
 
 Backlash supports both debugging applications on crash and realtime console,
-both are based on the Werkzeug Debugger and adapted to work with WebOb.
+both based on the Werkzeug Debugger.
 
-The debugging function is provided by the ``DebuggedApplication`` middleware,
-wrapping your application with this middleware will intercept any exception
-and display the traceback and an interactive console in your browser.
+The debugging function is provided by the ``WsgiDebuggedApplication`` middleware
+for WSGI applications and the ``AsgiDebuggedApplication`` middleware for ASGI
+applications (Starlette, FastAPI, bare ASGI apps). Wrapping your application
+with the middleware will intercept any exception and display the traceback and
+an interactive console in your browser.
 
 An interactive console will also be always available at ``/__console__`` path.
+
+``backlash.DebuggedApplication`` (importable also as
+``backlash.debug.DebuggedApplication``) is the same class as
+``backlash.wsgi.WsgiDebuggedApplication``, so existing WSGI setups keep
+working unchanged.
+
+ASGI Applications
++++++++++++++++++++++++++++++
+
+Bare ASGI applications are wrapped directly::
+
+    from backlash.asgi import AsgiDebuggedApplication
+
+    app = AsgiDebuggedApplication(app)
+
+Starlette and FastAPI applications should install the debugger with
+``add_middleware`` instead of wrapping the application object::
+
+    app.add_middleware(AsgiDebuggedApplication)
+
+This places the debugger inside Starlette's ``ServerErrorMiddleware``, which
+otherwise sends its own 500 response before re-raising, leaving the debugger
+no chance to render its page.
 
 Context Injectors
 +++++++++++++++++++++++++++++
 
-The ``DebuggedApplication`` middleware also makes possible to provide one or more
+The debugger middlewares also make possible to provide one or more
 ``context injectors``, those are simple python functions that will be called when
 an exception is raised to retrieve the context to store and make back available during
-debugging.
+debugging. Context injectors receive the WSGI environ or the ASGI scope of the
+failed request.
 
 Context injectors have to return a dictionary which will be merged into the current
 request context, the request context itself will be made available inside the debugger

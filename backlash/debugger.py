@@ -108,19 +108,6 @@ class DebuggerCore(object):
         return 200, 'text/html; charset=utf-8', \
             render_console_html(secret=self.secret).encode('utf-8')
 
-    # DONE(EVO-020): Remove or replace the dead gist paste endpoint
-    # Why:
-    # - traceback.paste() posts to the anonymous GitHub gist API, which was
-    #   discontinued in 2018, so the endpoint always fails; it was carried
-    #   into the probe verbatim to preserve the WSGI dispatch behavior.
-    # Done:
-    # - Either the paste cmd, this handler, tbtools.Traceback.paste() and the
-    #   'create paste' UI in tbtools PAGE_HTML/statics are removed together,
-    #   or the endpoint targets a working paste service; decision recorded
-    #   in the commit message.
-    # Non-Goals:
-    # - No new external service integration beyond what the decision needs;
-    #   no authentication/token management for GitHub.
     def get_source(self, frame):
         """Render the source viewer."""
         return 200, 'text/html; charset=utf-8', \

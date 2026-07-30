@@ -211,9 +211,9 @@ def test_console_page_and_eval():
 
 
 def test_console_reachable_under_mounted_root_path():
-    # Acceptance for EVO-010: when the app is mounted (e.g. Starlette Mount
-    # or uvicorn --root-path), scope['path'] carries the mount prefix and
-    # the console must still be reachable at <mount>/__console__.
+    # When the app is mounted (e.g. Starlette Mount or uvicorn --root-path),
+    # scope['path'] carries the mount prefix and the console must still be
+    # reachable at <mount>/__console__.
     app = AsgiDebuggedApplication(ok_app)
     status, _, body = response_of(run_asgi(
         app, path='/mounted/__console__', root_path='/mounted'))
