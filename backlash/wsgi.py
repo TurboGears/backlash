@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """WSGI shell of the interactive traceback debugger."""
 from http.client import responses as _HTTP_REASONS
 from urllib.parse import parse_qs

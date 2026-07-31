@@ -1,10 +1,10 @@
-from functools import partial
 import logging
 import threading
 import time
+from functools import partial
 
 
-class TimerTask(object):
+class TimerTask:
 
     def __init__(self, callable_, *args, **kwargs):
         self._callable = partial(callable_, *args, **kwargs)
@@ -16,7 +16,12 @@ class TimerTask(object):
     def run(self):
         try:
             self._callable()
-        except:
+        # BaseException and not Exception: the Timer worker loop invokes jobs
+        # without any outer guard, so anything escaping here kills the single
+        # long lived thread and silently disables slow request tracing.
+        # Under gevent (gevent.Timeout, GreenletExit) or a SystemExit raised
+        # by a context injector this is a real occurrence.
+        except BaseException:
             logging.exception('TimerTask failed')
         finally:
             self._finished = True
@@ -31,7 +36,7 @@ class Timer(threading.Thread):
     """
 
     def __init__(self, *args, **kwargs):
-        super(Timer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.lock = threading.Condition()
         self._jobs = []

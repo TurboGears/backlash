@@ -1,12 +1,12 @@
-from backlash._compat import string_types, bytes_
+import logging
+
 from backlash.tbtools import get_current_traceback
 from backlash.utils import RequestContext
 
-import logging
 log = logging.getLogger('backlash')
 
 
-class TraceErrorsMiddleware(object):
+class TraceErrorsMiddleware:
     def __init__(self, application, reporters, context_injectors):
         self.app = application
         self.reporters = reporters
@@ -31,7 +31,7 @@ class TraceErrorsMiddleware(object):
                 r.report(traceback)
             except Exception:
                 error = get_current_traceback(skip=1, show_hidden_frames=False)
-                environ['wsgi.errors'].write('\nError while reporting exception with %s\n' % r)
+                environ['wsgi.errors'].write(f'\nError while reporting exception with {r}\n')
                 environ['wsgi.errors'].write(error.plaintext)
 
     def _generate_response(self, environ, start_response):
@@ -52,7 +52,7 @@ class TraceErrorsMiddleware(object):
                 'response at a point where response headers were already '
                 'sent.\n')
         else:
-            yield bytes_('Internal Server Error')
+            yield b'Internal Server Error'
 
     def _report_errors_with_response(self, environ, start_response):
         self._report_errors(environ, None)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Transport-agnostic core of the interactive traceback debugger.
 
 ``DebuggerCore`` owns the debugger state (captured tracebacks, per-frame
@@ -10,18 +9,18 @@ The WSGI and ASGI shells in :mod:`backlash.wsgi` and :mod:`backlash.asgi`
 adapt request parsing, response sending, and exception capture to their
 transport.
 """
-import mimetypes
 import logging
-from os.path import join, dirname, basename, isfile
+import mimetypes
+from os.path import basename, dirname, isfile, join
 
-from backlash.tbtools import get_current_traceback, render_console_html
 from backlash.console import Console
+from backlash.tbtools import get_current_traceback, render_console_html
 from backlash.utils import gen_salt
 
 log = logging.getLogger('backlash')
 
 
-class DebuggerCore(object):
+class DebuggerCore:
     """State and endpoints shared by the WSGI and ASGI debugger middlewares.
 
     :param app: the wrapped application (WSGI or ASGI, owned by the shell).
@@ -124,7 +123,7 @@ class DebuggerCore(object):
         return 404, 'text/plain', b'Not Found'
 
 
-class _ConsoleFrame(object):
+class _ConsoleFrame:
     """Helper class so that we can reuse the frame console code for the
     standalone console.
     """

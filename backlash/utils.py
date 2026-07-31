@@ -1,4 +1,3 @@
-from backlash._compat import text_type, binary_type
 from random import SystemRandom
 
 SALT_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -19,12 +18,12 @@ def escape(s, quote=False):
         return ''
     if hasattr(s, '__html__'):
         return s.__html__()
-    if not isinstance(s, (text_type, binary_type)):
-        s = text_type(s)
-    if isinstance(s, binary_type):
+    if not isinstance(s, (str, bytes)):
+        s = str(s)
+    if isinstance(s, bytes):
         try:
             s.decode('ascii')
-        except:
+        except Exception:
             s = s.decode('utf-8', 'replace')
     s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
     if quote:

@@ -1,16 +1,16 @@
 import datetime as dt
+import logging
 import os
 import threading
-import logging
 
-
+from backlash.frtools import get_thread_stack
 from backlash.tbtools import get_current_traceback
-from backlash.frtools import get_thread_stack, DumpThread
 from backlash.utils import RequestContext
+
 from .timer import Timer
 
 
-class TraceSlowRequestsMiddleware(object):
+class TraceSlowRequestsMiddleware:
 
     def __init__(self, app, reporters, context_injectors, interval=25,
                  exclude_paths=None):
@@ -57,9 +57,9 @@ class TraceSlowRequestsMiddleware(object):
             traceback = get_thread_stack(thread_id, environ.get('PATH_INFO', ''),
                                          context=context, error_type='SlowRequestError')
         except KeyError:
-            logging.warn('\nUnable to retrieve SlowRequest Stack %s, '
-                         'thread %s probably finished execution in mean time\n',
-                         environ.get('PATH_INFO', ''), thread_id)
+            logging.warning('\nUnable to retrieve SlowRequest Stack %s, '
+                            'thread %s probably finished execution in mean time\n',
+                            environ.get('PATH_INFO', ''), thread_id)
             return
 
         for r in self.reporters:
@@ -67,7 +67,7 @@ class TraceSlowRequestsMiddleware(object):
                 r.report(traceback)
             except Exception:
                 error = get_current_traceback(skip=1, show_hidden_frames=False)
-                environ['wsgi.errors'].write('\nError while reporting slow request with %s\n' % r)
+                environ['wsgi.errors'].write(f'\nError while reporting slow request with {r}\n')
                 environ['wsgi.errors'].write(error.plaintext)
 
     @classmethod
@@ -95,7 +95,7 @@ class TraceSlowRequestsMiddleware(object):
                                        self.interval,
                                        environ,
                                        self._get_thread_id(),
-                                       dt.datetime.utcnow())
+                                       dt.datetime.now(dt.timezone.utc))
             # In some cases due to webob.Request.call_application() or
             # paste StatusCodeRedirect middleware multiple _start_tracing for the same
             # environ might happen without consuming the app_iter for the firsts

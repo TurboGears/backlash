@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ASGI shell of the interactive traceback debugger."""
 import sys
 from urllib.parse import parse_qs
