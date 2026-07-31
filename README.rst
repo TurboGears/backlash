@@ -1,6 +1,12 @@
 About backlash
 -------------------------
 
+.. image:: https://github.com/TurboGears/backlash/actions/workflows/run_tests.yml/badge.svg
+    :target: https://github.com/TurboGears/backlash/actions/workflows/run_tests.yml
+
+.. image:: https://img.shields.io/pypi/v/backlash.svg
+    :target: https://pypi.python.org/pypi/backlash
+
 backlash is a swiss army knife for web applications debugging, which provides:
 
 - An Interactive In Browser Debugger for WSGI and ASGI applications,
