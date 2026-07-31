@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     werkzeug.debug.console
     ~~~~~~~~~~~~~~~~~~~~~~
@@ -8,18 +7,17 @@
     :copyright: (c) 2011 by the Werkzeug Team, see AUTHORS for more details.
     :license: BSD.
 """
-import sys
 import code
-from types import CodeType
+import sys
 import threading
+from types import CodeType
 
-from backlash._compat import exec_, text_, binary_type
-from backlash.utils import escape
 from backlash.repr import debug_repr, dump, helper
+from backlash.utils import escape
 
 _local = threading.local()
 
-class HTMLStringO(object):
+class HTMLStringO:
     """A StringO version that HTML escapes on write."""
 
     def __init__(self):
@@ -50,8 +48,8 @@ class HTMLStringO(object):
         return val
 
     def _write(self, x):
-        if isinstance(x, binary_type):
-            x = text_(x, 'utf-8', 'replace')
+        if isinstance(x, bytes):
+            x = x.decode('utf-8', 'replace')
         self._buffer.append(x)
 
     def write(self, x):
@@ -61,23 +59,24 @@ class HTMLStringO(object):
         self._write(escape(''.join(x)))
 
 
-class ThreadedStream(object):
+class ThreadedStream:
     """Thread-local wrapper for sys.stdout for the interactive console."""
 
+    @staticmethod
     def push():
         if not isinstance(sys.stdout, ThreadedStream):
             sys.stdout = ThreadedStream()
         _local.stream = HTMLStringO()
-    push = staticmethod(push)
 
+    @staticmethod
     def fetch():
         try:
             stream = _local.stream
         except AttributeError:
             return ''
         return stream.reset()
-    fetch = staticmethod(fetch)
 
+    @staticmethod
     def displayhook(obj):
         try:
             stream = _local.stream
@@ -87,10 +86,9 @@ class ThreadedStream(object):
         # already generating HTML for us.
         if obj is not None:
             stream._write(debug_repr(obj))
-    displayhook = staticmethod(displayhook)
 
     def __setattr__(self, name, value):
-        raise AttributeError('read only attribute %s' % name)
+        raise AttributeError(f'read only attribute {name}')
 
     def __dir__(self):
         return dir(sys.__stdout__)
@@ -113,7 +111,7 @@ _displayhook = sys.displayhook
 sys.displayhook = ThreadedStream.displayhook
 
 
-class _ConsoleLoader(object):
+class _ConsoleLoader:
 
     def __init__(self):
         self._storage = {}
@@ -173,7 +171,7 @@ class _InteractiveConsole(code.InteractiveInterpreter):
 
     def runcode(self, code):
         try:
-            exec_(code, self.globals, self.locals)
+            exec(code, self.globals, self.locals)
         except Exception:
             self.showtraceback()
 
@@ -191,7 +189,7 @@ class _InteractiveConsole(code.InteractiveInterpreter):
         sys.stdout.write(data)
 
 
-class Console(object):
+class Console:
     """An interactive console."""
 
     def __init__(self, globals=None, locals=None, context=None):
@@ -204,7 +202,7 @@ class Console(object):
     def eval(self, code):
         return self._ipy.runsource(code)
 
-class _ConsoleFrame(object):
+class _ConsoleFrame:
     """Helper class so that we can reuse the frame console code for the
     standalone console.
     """

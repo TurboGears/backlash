@@ -12,3 +12,4 @@ dist/*
 *.egg-info/*
 .noseids
 .idea
+.pi-subagents/

@@ -1,11 +1,11 @@
 try:
     from raven.base import Client
-    from raven.utils.wsgi import get_current_url, get_headers, get_environ
+    from raven.utils.wsgi import get_current_url, get_environ, get_headers
 except ImportError:
     Client = None
 
 
-class SentryReporter(object):
+class SentryReporter:
     def __init__(self, sentry_dsn, **unused):
         if Client is None:
             raise RavenNotAvailable('Raven is not installed, maybe run "pip install raven"')

@@ -12,11 +12,11 @@ import pytest
 
 starlette = pytest.importorskip('starlette')
 
-from starlette.applications import Starlette
-from starlette.responses import PlainTextResponse
-from starlette.routing import Route
+from starlette.applications import Starlette  # noqa: E402
+from starlette.responses import PlainTextResponse  # noqa: E402
+from starlette.routing import Route  # noqa: E402
 
-from backlash.asgi import AsgiDebuggedApplication
+from backlash.asgi import AsgiDebuggedApplication  # noqa: E402
 
 
 async def crash(request):

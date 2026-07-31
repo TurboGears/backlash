@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,8 @@ name = "backlash"
 version = "0.4.1"
 description = "Interactive in-browser debugger and error reporting middleware for WSGI and ASGI applications"
 readme = { file = "README.rst", content-type = "text/x-rst" }
-license = { file = "LICENSE" }
+license = "MIT"
+requires-python = ">=3.9"
 authors = [
   { name = "Alessandro Molina", email = "alessandro@molina.fyi" }
 ]
@@ -16,9 +17,17 @@ classifiers = [
   "Intended Audience :: Developers",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware",
   "Topic :: Internet :: WWW/HTTP :: WSGI"
 ]
+
 [project.optional-dependencies]
 testing = [
   "pytest",
@@ -27,6 +36,8 @@ testing = [
 
 [project.urls]
 Homepage = "https://github.com/TurboGears/backlash"
+Repository = "https://github.com/TurboGears/backlash"
+Issues = "https://github.com/TurboGears/backlash/issues"
 
 [tool.setuptools]
 include-package-data = true
@@ -34,3 +45,19 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 exclude = ["examples", "tests"]
+
+[tool.setuptools.package-data]
+backlash = ["statics/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+output-format = "grouped"
+exclude = ["build", "dist", ".venv", "venv", "env", "__pycache__"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I001"]

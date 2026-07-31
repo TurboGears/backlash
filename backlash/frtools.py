@@ -1,5 +1,7 @@
-import sys, inspect
-from .tbtools import Traceback, Frame
+import inspect
+import sys
+
+from .tbtools import Frame, Traceback
 
 
 class DumpThread(Exception):
