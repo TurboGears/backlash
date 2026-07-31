@@ -76,8 +76,7 @@ $(function() {
   $('span.nojavascript')
     .removeClass('nojavascript')
     .html('<p>To switch between the interactive traceback and the plaintext ' +
-          'one, you can click on the "Traceback" headline.  From the text ' +
-          'traceback you can also create a paste of it. ' + (!EVALEX ? '' :
+          'one, you can click on the "Traceback" headline. ' + (!EVALEX ? '' :
           'For code execution mouse-over the frame you want to debug and ' +
           'click on the console icon on the right side.' +
           '<p>You can execute arbitrary Python code in the stack frames and ' +
@@ -85,33 +84,6 @@ $(function() {
           '<ul><li><code>dump()</code> shows all variables in the frame' +
           '<li><code>dump(obj)</code> dumps all that\'s known about the object' +
           '<li><code>ctx</code> the context of the failed request</ul>'));
-
-  /**
-   * Add the pastebin feature
-   */
-  $('div.plain form')
-    .submit(function() {
-      var label = $('input[type="submit"]', this);
-      var old_val = label.val();
-      label.val('submitting...');
-      $.ajax({
-        dataType:     'json',
-        url:          document.location.pathname,
-        data:         {__debugger__: 'yes', tb: TRACEBACK, cmd: 'paste',
-                       s: SECRET},
-        success:      function(data) {
-          $('div.plain span.pastemessage')
-            .removeClass('pastemessage')
-            .text('Paste created: ')
-            .append($('<a>#' + data.id + '</a>').attr('href', data.url));
-        },
-        error:        function() {
-          alert('Error: Could not submit paste.  No network connection?');
-          label.val(old_val);
-        }
-      });
-      return false;
-    });
 
   // if we have javascript we submit by ajax anyways, so no need for the
   // not scaling textarea.
