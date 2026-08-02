@@ -69,3 +69,11 @@ def test_exceptions_are_rendered_as_a_traceback(monkeypatch):
     assert '<div class="traceback">' in transcript
     assert '<pre>1/0</pre>' in transcript  # the offending console line
     assert '<blockquote>ZeroDivisionError: division by zero</blockquote>' in transcript
+
+
+def test_multi_line_input_is_buffered_until_complete(monkeypatch):
+    monkeypatch.setattr(sys, 'stdout', sys.stdout)
+    console = Console()
+    assert console.eval('if True:') == '>>> if True:\n'
+    assert console.eval('    x = 6*7') == '...     x = 6*7\n'
+    assert console.eval('x') == '>>> x\n<span class="number">42</span>'
