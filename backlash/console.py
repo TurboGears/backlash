@@ -134,7 +134,9 @@ def _wrap_compiler(console):
     compile = console.compile
     def func(source, filename, symbol):
         code = compile(source, filename, symbol)
-        console.loader.register(code, source)
+        if code is not None:
+            # codeop returns None to signal that more input is needed
+            console.loader.register(code, source)
         return code
     console.compile = func
 
