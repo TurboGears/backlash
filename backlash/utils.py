@@ -21,10 +21,7 @@ def escape(s, quote=False):
     if not isinstance(s, (str, bytes)):
         s = str(s)
     if isinstance(s, bytes):
-        try:
-            s.decode('ascii')
-        except Exception:
-            s = s.decode('utf-8', 'replace')
+        s = s.decode('utf-8', 'replace')
     s = s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
     if quote:
         s = s.replace('"', "&quot;")
