@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "backlash"
-version = "0.5.0"
+version = "0.5.1"
 description = "Interactive in-browser debugger and error reporting middleware for WSGI and ASGI applications"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 license = "MIT"
