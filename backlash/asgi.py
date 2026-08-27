@@ -29,6 +29,10 @@ class AsgiDebuggedApplication(DebuggerCore):
             await self.app(scope, receive, send)
             return
 
+        if self.allow_debug is not None and not self.allow_debug(scope):
+            await self.app(scope, receive, send)
+            return
+
         query = {key: values[0] for key, values in
                  parse_qs(scope.get('query_string', b'').decode('latin-1')).items()}
         # scope['path'] includes the mount prefix; console_path is app-relative

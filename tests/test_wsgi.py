@@ -1,6 +1,8 @@
 """Behavioral tests for the WSGI debugger middleware."""
 import io
 
+import pytest
+
 from backlash.wsgi import WsgiDebuggedApplication
 
 
@@ -210,6 +212,52 @@ def test_context_injectors_receive_environ():
     assert seen and seen[0]['PATH_INFO'] == '/'
     traceback = next(iter(app.tracebacks.values()))
     assert traceback.context['marker'] == 'injected'
+
+
+def test_allow_debug_false_lets_exception_propagate_uncaught():
+    app = WsgiDebuggedApplication(failing_app, allow_debug=lambda environ: False)
+    with pytest.raises(ZeroDivisionError):
+        run_wsgi(app)
+    assert not app.tracebacks  # denied requests are never captured
+
+
+def test_allow_debug_false_console_endpoint_reaches_wrapped_app_untouched():
+    app = WsgiDebuggedApplication(ok_app, allow_debug=lambda environ: False)
+    status, _, body, _ = run_wsgi(
+        app, qs='__debugger__=yes&cmd=resource&f=style.css')
+    assert status == '200 OK'
+    assert body == b'app-response'  # not the static resource
+
+
+def test_allow_debug_receives_environ_and_true_preserves_behavior():
+    seen = []
+
+    def allow_debug(environ):
+        seen.append(environ)
+        return True
+
+    app = WsgiDebuggedApplication(failing_app, allow_debug=allow_debug)
+    status, _, body, _ = run_wsgi(app)
+    assert seen and seen[0]['PATH_INFO'] == '/'
+    assert status == '500 INTERNAL SERVER ERROR'
+    assert app.secret.encode('ascii') in body
+
+
+def test_allow_debug_reevaluated_on_every_request():
+    allowed = {'value': True}
+    app = WsgiDebuggedApplication(
+        failing_app, allow_debug=lambda environ: allowed['value'])
+
+    run_wsgi(app)  # allowed: crash captured, secret handed out
+    frame_id = next(fid for fid, frame in app.frames.items()
+                    if 'frame_local' in frame.console.eval('dir()'))
+
+    allowed['value'] = False
+    with pytest.raises(ZeroDivisionError):
+        # a stale secret from an earlier allowed request no longer works
+        run_wsgi(
+            app, qs='__debugger__=yes&cmd=frame_local&frm=%d&s=%s' % (
+                frame_id, app.secret))
 
 
 def test_backward_compatible_import_path():

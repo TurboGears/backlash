@@ -221,6 +221,63 @@ def test_console_reachable_under_mounted_root_path():
     assert b'CONSOLE_MODE = true' in body
 
 
+def test_allow_debug_false_lets_exception_propagate_uncaught():
+    app = AsgiDebuggedApplication(failing_app, allow_debug=lambda scope: False)
+    with pytest.raises(ZeroDivisionError):
+        run_asgi(app)
+    assert not app.tracebacks  # denied requests are never captured
+
+
+def test_allow_debug_false_console_endpoint_reaches_wrapped_app_untouched():
+    app = AsgiDebuggedApplication(ok_app, allow_debug=lambda scope: False)
+    status, _, body = response_of(run_asgi(
+        app, qs=b'__debugger__=yes&cmd=resource&f=style.css'))
+    assert status == 200
+    assert body == b'app-response'  # not the static resource
+
+
+def test_allow_debug_receives_scope_and_true_preserves_behavior():
+    seen = []
+
+    def allow_debug(scope):
+        seen.append(scope)
+        return True
+
+    app = AsgiDebuggedApplication(failing_app, allow_debug=allow_debug)
+    status, _, body = response_of(run_asgi(app))
+    assert seen and seen[0]['type'] == 'http'
+    assert status == 500
+    assert app.secret.encode('ascii') in body
+
+
+def test_allow_debug_not_consulted_for_non_http_scopes():
+    seen = []
+
+    async def recording_app(scope, receive, send):
+        pass
+
+    app = AsgiDebuggedApplication(
+        recording_app, allow_debug=lambda scope: seen.append(scope) or False)
+    asyncio.run(app({'type': 'lifespan'}, None, None))
+    assert seen == []  # non-http scopes bypass the check entirely
+
+
+def test_allow_debug_reevaluated_on_every_request():
+    allowed = {'value': True}
+    app = AsgiDebuggedApplication(
+        failing_app, allow_debug=lambda scope: allowed['value'])
+
+    run_asgi(app)  # allowed: crash captured, secret handed out
+    frame_id = next(fid for fid, frame in app.frames.items()
+                    if 'frame_local' in frame.console.eval('dir()'))
+
+    allowed['value'] = False
+    with pytest.raises(ZeroDivisionError):
+        # a stale secret from an earlier allowed request no longer works
+        run_asgi(app, qs=b'__debugger__=yes&cmd=frame_local&frm=%d&s=%s' % (
+            frame_id, app.secret.encode('ascii')))
+
+
 def test_context_injectors_receive_scope():
     seen = []
 

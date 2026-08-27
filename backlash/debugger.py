@@ -36,10 +36,17 @@ class DebuggerCore:
     :param context_injectors: functions called with the request environment
                               (WSGI environ or ASGI scope) on crash; their
                               return values become debugging context.
+    :param allow_debug: optional callable invoked with the request
+                        environment (WSGI environ or ASGI scope) on every
+                        request, before any debugger behavior. When it
+                        returns a false value, the request bypasses the
+                        debugger entirely, as if it were disabled just for
+                        that request. ``None`` (the default) always allows
+                        it, unchanged from prior releases.
     """
     def __init__(self, app, evalex=True, console_path='/__console__',
                  console_init_func=None, show_hidden_frames=False,
-                 lodgeit_url=None, context_injectors=None):
+                 lodgeit_url=None, context_injectors=None, allow_debug=None):
         if not console_init_func:
             console_init_func = dict
         self.app = app
@@ -51,6 +58,7 @@ class DebuggerCore:
         self.show_hidden_frames = show_hidden_frames
         self.secret = gen_salt(20)
         self.context_injectors = context_injectors or []
+        self.allow_debug = allow_debug
 
         if lodgeit_url is not None:
             from warnings import warn

@@ -19,6 +19,9 @@ class WsgiDebuggedApplication(DebuggerCore):
 
     def __call__(self, environ, start_response):
         """Dispatch the requests."""
+        if self.allow_debug is not None and not self.allow_debug(environ):
+            return self.app(environ, start_response)
+
         query = {key: values[0] for key, values in
                  parse_qs(environ.get('QUERY_STRING', '')).items()}
         response = self.debugger_response(environ.get('PATH_INFO', ''), query)
